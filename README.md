@@ -59,4 +59,25 @@ Configurar puerto desde `appsettings.json`:
 dotnet run
 ```
 
+Docker
+ - Construir la imagen Docker (desde la raíz del proyecto):
+
+```powershell
+docker build -t apiaks-netcore:latest .
+```
+
+ - Ejecutar el contenedor exponiendo el puerto 5000 localmente:
+
+```powershell
+docker run --rm -p 5000:5000 apiaks-netcore:latest
+```
+
+ - Para usar otro puerto local o cambiar la URL que la aplicación escucha, exporta la variable `ASPNETCORE_URLS` al ejecutar:
+
+```powershell
+docker run --rm -p 5050:5050 -e ASPNETCORE_URLS="http://*:5050" apiaks-netcore:latest
+```
+
+Nota: el `Dockerfile` usa un multi-stage build para compilar con el SDK y publicar sobre la imagen de runtime.
+
 # apiAKS_NetCore

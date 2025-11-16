@@ -1,0 +1,20 @@
+# Ignore build outputs
+bin/
+obj/
+
+# User-specific
+.vs/
+.user
+
+# Node modules (if any)
+node_modules/
+
+# Logs, temp files
+*.log
+*.tmp
+
+# Git
+.git
+
+# Docker files
+Dockerfile*
