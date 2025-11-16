@@ -83,3 +83,7 @@ docker run -d --name apiaks -p 5009:5000 -e "AppSettings__Url=http://*:5000" api
 Nota: el `Dockerfile` usa un multi-stage build para compilar con el SDK y publicar sobre la imagen de runtime.
 
 # apiAKS_NetCore
+# En resumen, estos son los comandos para crear la imagen y el contenedor de apiAKS_NetCore
+docker build -t apiaks-netcore:latest .
+
+docker run -d --name apiaks -p 5009:5000 apiaks-netcore:latest
