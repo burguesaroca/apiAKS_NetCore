@@ -42,22 +42,24 @@ Swagger UI:
 
 Configurar puerto desde `appsettings.json`:
 
- - El proyecto lee `AppSettings:Url` en `appsettings.json`. Por defecto está en `http://localhost:5000`.
+ - Se ha actualizado `appsettings.json` en este proyecto; ahora la clave `AppSettings:Url` puede apuntar a `http://localhost:5009` según la configuración que hayas aplicado.
+
  - Para cambiar el puerto edita `appsettings.json`, por ejemplo:
 
 ```json
 {
 	"AppSettings": {
-		"Url": "http://localhost:5050"
+		"Url": "http://localhost:5009"
 	}
 }
 ```
 
- - Luego ejecuta la API y escuchará en el puerto configurado:
+ - Luego ejecuta la API y escuchará en la URL/puerto configurado:
 
 ```powershell
 dotnet run
 ```
+
 
 Docker
  - Construir la imagen Docker (desde la raíz del proyecto):
@@ -66,16 +68,16 @@ Docker
 docker build -t apiaks-netcore:latest .
 ```
 
- - Ejecutar el contenedor exponiendo el puerto 5000 localmente:
+ - Ejecutar el contenedor (ejemplo usado en este repositorio):
 
 ```powershell
-docker run --rm -p 5000:5000 apiaks-netcore:latest
+docker run -d --name apiaks -p 5009:5000 apiaks-netcore:latest
 ```
 
- - Para usar otro puerto local o cambiar la URL que la aplicación escucha, exporta la variable `ASPNETCORE_URLS` al ejecutar:
+ - Nota: este comando asume que `appsettings.json` dentro de la imagen está configurado para usar `http://localhost:5009` o que la aplicación está enlazada a `0.0.0.0` en el puerto del contenedor. Si la aplicación no responde desde el host, ejecuta con una variable de entorno que fuerce el binding a todas las interfaces:
 
 ```powershell
-docker run --rm -p 5050:5050 -e ASPNETCORE_URLS="http://*:5050" apiaks-netcore:latest
+docker run -d --name apiaks -p 5009:5000 -e "AppSettings__Url=http://*:5000" apiaks-netcore:latest
 ```
 
 Nota: el `Dockerfile` usa un multi-stage build para compilar con el SDK y publicar sobre la imagen de runtime.
