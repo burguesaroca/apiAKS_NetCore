@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: apiaks-service
+  namespace: apiaks
+  labels:
+    app: apiaks
+spec:
+  type: LoadBalancer
+  selector:
+    app: apiaks
+  ports:
+    - protocol: TCP
+      port: 80        # external port (LoadBalancer)
+      targetPort: 5000 # container port

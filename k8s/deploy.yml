@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: apiaks-deployment
+  namespace: apiaks
+  labels:
+    app: apiaks
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: apiaks
+  template:
+    metadata:
+      labels:
+        app: apiaks
+    spec:
+      containers:
+        - name: apiaks
+          # NOTE: replace this image with a registry path if pushing to AKS (e.g. myregistry.azurecr.io/apiaks-netcore:latest)
+          image: apiaks-netcore:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5000
+          env:
+            # Ensure the app binds to all interfaces inside the pod
+            - name: AppSettings__Url
+              value: "http://*:5000"
+          livenessProbe:
+            tcpSocket:
+              port: 5000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            timeoutSeconds: 5
+          readinessProbe:
+            tcpSocket:
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
