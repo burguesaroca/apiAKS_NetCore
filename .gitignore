@@ -1,0 +1,66 @@
+# Recommended .gitignore for .NET projects
+# https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
+
+# Build artifacts
+bin/
+obj/
+out/
+artifacts/
+
+# Visual Studio cache and config
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code workspace settings
+.vscode/
+
+# Rider
+.idea/
+*.sln.iml
+
+# NuGet
+*.nupkg
+packages/
+.packages/
+project.lock.json
+project.fragment.lock.json
+*.nuget.props
+*.nuget.targets
+
+# ASP.NET Scaffolding
+ScaffoldedFiles/
+
+# Publish outputs
+publish/
+wwwroot/node_modules/
+
+# IIS Express
+/.vs/**/applicationhost.config
+
+# User-specific files
+*.userprefs
+
+# DotCover
+.dotCover/
+
+# Test results
+TestResults/
+coverage/
+
+# Temporary files
+*.tmp
+*.temp
+~$*
+
+# Local secrets (if you store them as files, but do NOT ignore appsettings.json by default)
+secrets.json
+secrets.*.json
+
+# JetBrains Rider
+/.idea/
+
+# macOS
+.DS_Store
