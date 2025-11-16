@@ -15,10 +15,13 @@ spec:
       labels:
         app: apiaks
     spec:
+      # 🔹 Aquí indicamos el secret para extraer la imagen de ACR
+      imagePullSecrets:
+        - name: acr-secret
       containers:
         - name: apiaks
           # NOTE: replace this image with a registry path if pushing to AKS (e.g. myregistry.azurecr.io/apiaks-netcore:latest)
-          image: apiaks-netcore:latest
+          image: miacrnameuniquexyz.azurecr.io/apiaks-netcore:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5000
