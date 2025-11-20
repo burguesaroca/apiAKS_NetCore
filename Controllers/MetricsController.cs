@@ -58,6 +58,10 @@ namespace apiAKS_NetCore.Controllers
             return NotFound("Could not retrieve memory metrics.");
         }
 
+        // --------------------------------------------------------------------
+        // MEMORY
+        // --------------------------------------------------------------------
+
         private async Task<object?> RunKubectlTopNodesMemory()
         {
             var psi = new ProcessStartInfo("kubectl")
@@ -82,7 +86,6 @@ namespace apiAKS_NetCore.Controllers
 
             var nodes = new List<object>();
             double totalMi = 0;
-            double totalPercent = 0;
             int count = 0;
 
             foreach (var line in lines)
@@ -101,7 +104,6 @@ namespace apiAKS_NetCore.Controllers
                 nodes.Add(new { name, memoryMi, memoryPercent });
 
                 totalMi += memoryMi;
-                totalPercent += memoryPercent;
                 count++;
             }
 
@@ -280,7 +282,9 @@ namespace apiAKS_NetCore.Controllers
             catch { return 0; }
         }
 
-        // ---------- CPU (SIN CAMBIOS, solo igualación de campos ya estaba correcta) ----------
+        // --------------------------------------------------------------------
+        // CPU (CORREGIDO)
+        // --------------------------------------------------------------------
 
         private async Task<object?> RunKubectlTopNodes()
         {
@@ -302,7 +306,6 @@ namespace apiAKS_NetCore.Controllers
 
             var nodes = new List<object>();
             double totalCores = 0;
-            double totalPercent = 0;
             int count = 0;
 
             foreach (var line in lines)
@@ -318,7 +321,6 @@ namespace apiAKS_NetCore.Controllers
                 nodes.Add(new { name, cpuCores, cpuPercent });
 
                 totalCores += cpuCores;
-                totalPercent += cpuPercent;
                 count++;
             }
 
@@ -329,8 +331,8 @@ namespace apiAKS_NetCore.Controllers
             {
                 source = "kubectl",
                 nodeCount = count,
-                totalCpuCoresUsed = Math.Round(totalCores, 3),
-                totalCpuCoresCapacity = Math.Round(totalCapacity, 3),
+                totalCpuCoresUsed = Math.Round(totalCores, 4),
+                totalCpuCoresCapacity = Math.Round(totalCapacity, 4),
                 clusterCpuPercent = Math.Round(clusterPercent, 2),
                 nodes
             };
@@ -374,14 +376,23 @@ namespace apiAKS_NetCore.Controllers
             catch { return 0; }
         }
 
+        // ⭐ NUEVA FUNCIÓN CORRECTA PARA CPU ⭐
         private double ParseCpuValue(string s)
         {
             if (string.IsNullOrWhiteSpace(s))
                 return 0;
 
+            s = s.Trim().ToLowerInvariant();
+
+            // nanoCores → cores
+            if (s.EndsWith("n") && double.TryParse(s[..^1], out var n))
+                return n / 1_000_000_000.0;
+
+            // milliCores → cores
             if (s.EndsWith("m") && double.TryParse(s[..^1], out var m))
                 return m / 1000.0;
 
+            // cores
             if (double.TryParse(s, out var v))
                 return v;
 
@@ -392,6 +403,8 @@ namespace apiAKS_NetCore.Controllers
         {
             if (string.IsNullOrWhiteSpace(s))
                 return 0;
+
+            s = s.Trim().ToLowerInvariant();
 
             if (s.EndsWith("m") && double.TryParse(s[..^1], out var m))
                 return m / 1000.0;
@@ -408,7 +421,6 @@ namespace apiAKS_NetCore.Controllers
                 return 0;
 
             s = s.Trim().TrimEnd('%');
-
             return double.TryParse(s, out var v) ? v : 0;
         }
 
@@ -448,13 +460,14 @@ namespace apiAKS_NetCore.Controllers
             {
                 var name = item.GetProperty("metadata").GetProperty("name").GetString() ?? "";
                 var cpuStr = item.GetProperty("usage").GetProperty("cpu").GetString() ?? "";
+
                 var cpuCores = ParseCpuValue(cpuStr);
 
                 double cpuPercent = capacity > 0
                     ? (cpuCores / (capacity / items.GetArrayLength())) * 100.0
                     : 0;
 
-                nodes.Add(new { name, cpuCores, cpuPercent = Math.Round(cpuPercent, 2) });
+                nodes.Add(new { name, cpuCores, cpuPercent = Math.Round(cpuPercent, 4) });
 
                 total += cpuCores;
                 count++;
@@ -466,8 +479,8 @@ namespace apiAKS_NetCore.Controllers
             {
                 source = "metrics-api",
                 nodeCount = count,
-                totalCpuCoresUsed = Math.Round(total, 3),
-                totalCpuCoresCapacity = Math.Round(capacity, 3),
+                totalCpuCoresUsed = Math.Round(total, 4),
+                totalCpuCoresCapacity = Math.Round(capacity, 4),
                 clusterCpuPercent = Math.Round(clusterPercent, 2),
                 nodes
             };
