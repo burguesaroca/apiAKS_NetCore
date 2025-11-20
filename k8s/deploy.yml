@@ -15,6 +15,7 @@ spec:
       labels:
         app: apiaks
     spec:
+      serviceAccountName: apiaks-metrics-reader
       # 🔹 Aquí indicamos el secret para extraer la imagen de ACR
       imagePullSecrets:
         - name: acr-secret
